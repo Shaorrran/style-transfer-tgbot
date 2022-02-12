@@ -62,6 +62,7 @@ async def help(message: aiogram.types.Message) -> None:
 
 @internals.DISPATCHER.message_handler(state="*", commands="cancel")
 @internals.DISPATCHER.message_handler(aiogram.dispatcher.filters.Text(equals="cancel", ignore_case=True), state="*")
+@internals.DISPATCHER.callback_query_handler(lambda c: c.data and c.data.lower() == "cancel", state="*")
 async def cancel(message: aiogram.types.Message, state: aiogram.dispatcher.FSMContext):
     LOGGER.info("Cancelling previous command...")
     current_state = await state.get_state()
