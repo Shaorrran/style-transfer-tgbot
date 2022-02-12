@@ -1,0 +1,58 @@
+{
+    "abstract": {
+        "display_name": "Abstract art",
+        "path": "styles/abstract.jpg"
+    },
+    "antimonocromatismo": {
+        "display_name": "Antimonocromatismo",
+        "path": "styles/antimonocromatismo.jpg"
+    },
+    "blots": {
+        "display_name": "Paint blots style",
+        "path": "styles/blots.jpg"
+    },
+    "brush_strokes": {
+        "display_name": "Brush strokes style",
+        "path": "styles/brushstrokes.jpg"
+    },
+    "impress": {
+        "display_name": "Impressionism",
+        "path": "styles/impressionism.jpg"
+    },
+    "landscape": {
+        "display_name": "Landscape art",
+        "path": "styles/landscape.jpg"
+    },
+    "light": {
+        "display_name": "Light lines painting",
+        "path": "styles/light.jpg"
+    },
+    "macro": {
+        "display_name": "Macro photo",
+        "path": "styles/macrophoto.jpg"
+    },
+    "orph": {
+        "display_name": "Orphism",
+        "path": "styles/orphism.jpg"
+    },
+    "paint": {
+        "display_name": "Paint portrait style",
+        "path": "styles/paint_portrait.jpg"
+    },
+    "pastel": {
+        "display_name": "Pastel painting",
+        "path": "styles/pastel.jpg"
+    },
+    "pencil": {
+        "display_name": "Pencil painting",
+        "path": "styles/pencil.jpg"
+    },
+    "jp": {
+        "display_name": "Ukiyo-e",
+        "path": "styles/ukiyo-e.jpg"
+    },
+    "watercolor": {
+        "display_name": "Watercolor painting",
+        "path": "styles/watercolor.jpg"
+    }
+}
