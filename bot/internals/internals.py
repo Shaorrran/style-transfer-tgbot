@@ -6,14 +6,17 @@ import os
 import typing as tp
 
 import aiogram
+import aiogram.contrib.fsm_storage.memory
 import ujson
 
 async def set_commands(bot: aiogram.Bot) -> None:
     commands = [
+        aiogram.types.bot_command.BotCommand("/start", description="Starts the bot and shows a greeting message."),
+        aiogram.types.bot_command.BotCommand("/help", description="Show the help screen."),
         aiogram.types.bot_command.BotCommand("/content", description="Upload an image to be stylized."),
         aiogram.types.bot_command.BotCommand("/style", description="Select or upload an image to be used as style source."),
+        aiogram.types.bot_command.BotCommand("/transfer", description="Perform style transfer."),
         aiogram.types.bot_command.BotCommand("/cancel", description="Cancel current command."),
-        aiogram.types.bot_command.BotCommand("/transfer", description="Perform style transfer.")
     ]
     await bot.set_my_commands(commands)
 
@@ -25,7 +28,7 @@ logging.basicConfig(level=logging.getLevelName(CONFIG["verbose"].get("verbosity"
     logger: %(name)s — %(message)s""")
 LOGGER = logging.getLogger(__name__)
 BOT = aiogram.Bot(token=CONFIG["bot"]["token"], parse_mode="MarkdownV2")
-DISPATCHER = aiogram.Dispatcher(BOT)
+DISPATCHER = aiogram.Dispatcher(BOT, storage=aiogram.contrib.fsm_storage.memory.MemoryStorage())
 
 _styles_path = pathlib.Path(CONFIG["styles"]["config_path"])
 if not _styles_path.is_absolute():
