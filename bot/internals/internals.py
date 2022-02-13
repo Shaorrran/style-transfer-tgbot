@@ -72,7 +72,7 @@ def start_bot() -> None:
             on_shutdown=on_shutdown,
             skip_updates=True,
             host=CONFIG["bot"]["webhook_host"],
-            port=CONFIG["bot"]["webhook_host"]
+            port=int(CONFIG["bot"]["webhook_host"])
         )
     else:
         raise ValueError("Launch strategy incorrect. Please check your .env file for correctness.")
