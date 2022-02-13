@@ -47,8 +47,8 @@ async def on_startup(dp: aiogram.Dispatcher) -> None:
     await set_commands(BOT)
     if CONFIG["bot"]["event_strategy"] == "webhook":
         LOGGER.warning("Setting up webhook.")
-        if not (CONFIG["bot"].get("webhook_host") or CONFIG["bot"].get("webhook_port")):
-            raise ValueError("Webhook host or port specification is incorrect. Please check your config.")
+        if not CONFIG["bot"].get("webhook_host"):
+            raise ValueError("Webhook host specification is incorrect. Please check your config.")
         if not CONFIG["bot"].get("webhook_path"):
             LOGGER.warn("Webhook path not provided, assuming we should call /")
             CONFIG["bot"]["webhook_path"] = "/"
@@ -72,7 +72,7 @@ def start_bot() -> None:
             on_shutdown=on_shutdown,
             skip_updates=True,
             host="0.0.0.0",
-            port=int(os.getenv("PORT"))
+            port=int(os.getenv("PORT")) # heroku assigns a random open port to each dyno, so assume we have an envvar denoting it.
         )
     else:
         raise ValueError("Launch strategy incorrect. Please check your .env file for correctness.")
