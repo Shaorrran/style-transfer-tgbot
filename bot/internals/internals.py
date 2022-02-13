@@ -52,7 +52,7 @@ async def on_startup(dp: aiogram.Dispatcher) -> None:
         if not CONFIG["bot"].get("webhook_path"):
             LOGGER.warn("Webhook path not provided, assuming we should call /")
             CONFIG["bot"]["webhook_path"] = ""
-        CONFIG["bot"] = CONFIG["bot"]["webhook_path"].lstrip("/") # the executor adds the slash automatically
+        CONFIG["bot"]["webhook_path"] = CONFIG["bot"]["webhook_path"].lstrip("/") # the executor adds the slash automatically
         await BOT.set_webhook(str(CONFIG["bot"]["webhook_host"] + CONFIG["bot"]["webhook_path"]))
 
 async def on_shutdown(dp: aiogram.Dispatcher) -> None:
