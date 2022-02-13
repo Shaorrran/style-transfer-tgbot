@@ -52,7 +52,7 @@ async def on_startup(dp: aiogram.Dispatcher) -> None:
         if not CONFIG["bot"].get("webhook_path"):
             LOGGER.warn("Webhook path not provided, assuming we should call /")
             CONFIG["bot"]["webhook_path"] = "/"
-        await BOT.set_webhook(str(CONFIG["bot"]["webhook_host"] + ":" + CONFIG["bot"]["webhook_port"] + CONFIG["bot"]["webhook_path"]))
+        await BOT.set_webhook(str(CONFIG["bot"]["webhook_host"] + CONFIG["bot"]["webhook_path"]))
 
 async def on_shutdown(dp: aiogram.Dispatcher) -> None:
     LOGGER.warning("Deleting webhook")
@@ -71,7 +71,7 @@ def start_bot() -> None:
             on_startup=on_startup,
             on_shutdown=on_shutdown,
             skip_updates=True,
-            host=CONFIG["bot"]["webhook_host"],
+            host="0.0.0.0",
             port=int(CONFIG["bot"]["webhook_port"])
         )
     else:
