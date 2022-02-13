@@ -1,8 +1,11 @@
 import copy
+import io
 import itertools
 import logging
 
 from bot import internals
+
+import bot.style_transfer
 
 import aiogram
 import aiogram.dispatcher.filters.state
@@ -17,6 +20,11 @@ class LoadContent(aiogram.dispatcher.filters.state.StatesGroup):
 class LoadStyle(aiogram.dispatcher.filters.state.StatesGroup):
     waiting_for_selection = aiogram.dispatcher.filters.state.State()
     waiting_for_image = aiogram.dispatcher.filters.state.State()
+
+@dataclass
+class ImageHolder:
+    content = None
+    style = None
 
 @internals.DISPATCHER.message_handler(commands=["content", "image"])
 async def content(message: aiogram.types.Message, state: aiogram.dispatcher.FSMContext) -> None:
@@ -38,6 +46,7 @@ async def content_upload(message: aiogram.types.Message, state: aiogram.dispatch
     token = internals.CONFIG["bot"]["token"]
     file_path = (await message.photo[-1].get_file()).file_path
     await state.update_data(content_image=skimage.io.imread(f"https://api.telegram.org/file/bot{token}/{file_path}"))
+    ImageHolder.content = state.get_data()["content_image"]
     LOGGER.debug("Loaded image.")
     await message.reply(aiogram.utils.markdown.text(
         aiogram.utils.markdown.text("Content set\. Now run "),
@@ -100,6 +109,7 @@ async def style_select(query: aiogram.types.callback_query.CallbackQuery, state:
     LOGGER.debug(f"Current state is {state_data}")
     image = skimage.io.imread(internals.STYLES[query.data.lower().replace("style_", "")]["path"])
     await state.update_data(style_image=image)
+    ImageHolder.style = image
     LOGGER.debug("Read corresponding image.")
     await query.answer("Style set\. Run /transfer or /run to perform style transfer\.")
     await query.message.edit_reply_markup(None)
@@ -125,6 +135,7 @@ async def style_custom_upload(message: aiogram.types.Message, state: aiogram.dis
     token = internals.CONFIG["bot"]["token"]
     file_path = (await message.photo[-1].get_file()).file_path
     await state.update_data(style_image=skimage.io.imread(f"https://api.telegram.org/file/bot{token}/{file_path}"))
+    ImageHolder.style = state.get_data()["style_image"]
     LOGGER.debug("Loaded image.")
     await message.reply("Style set\. Run `/transfer` or `/run` to perform style transfer\.")
     await state.finish()
@@ -136,5 +147,24 @@ async def style_incorrect_choice(query: aiogram.types.callback_query.CallbackQue
 @internals.DISPATCHER.message_handler(commands=["transfer", "run"])
 async def transfer(message: aiogram.types.Message) -> None:
     LOGGER.debug("Attempting transfer...")
-    LOGGER.critical("Style transfer not ready yet!")
-    await message.reply("Not implemented yet\.")
+    if not ImageHolder.content:
+        await message.reply("No content image found\. Please run `/content` before attempting style transfer\.")
+        return
+    if not ImageHolder.style:
+        await message.reply("No style image found\. Please run `/style` before attempting style transfer\.")
+        return
+    styled = bot.style_transfer.style_transfer_converter(ImageHolder.content, ImageHolder.style)
+    if isinstance(styled, list):
+        albums = [styled[i:i+8] for i in range(0, len(styled), 8)]
+        for i in albums:
+            media_group = []
+            for j in i:
+                file = aiogram.types.BufferedInputFile(j)
+                image = aiogram.types.InputMediaPhoto(file, caption="Styled image")
+                media_group.append(image)
+            await message.answer_media_group(media_group)
+    elif isinstance(styled, io.BytesIO):
+        image = aiogram.types.InputMediaPhoto(styled, caption="Styled image")
+        await message.reply_photo(image)
+    else:
+        raise ValueError("Style transfer returned something that should not have been returned.")
