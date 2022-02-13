@@ -64,8 +64,8 @@ def start_bot() -> None:
         LOGGER.warning("Starting polling...")
         aiogram.utils.executor.start_polling(DISPATCHER, skip_updates=True, on_startup=on_startup)
     elif CONFIG["bot"].get("event_strategy") == "webhook":
-        if not (CONFIG["bot"]["webhook_path"] and CONFIG["bot"]["webhook_host"] and CONFIG["bot"]["webhook_port"]):
-            raise ValueError("\"webhook\" strategy selected but no host and/or port provided.")
+        if not (CONFIG["bot"]["webhook_path"] and CONFIG["bot"]["webhook_host"]):
+            raise ValueError("\"webhook\" strategy selected but no host provided.")
         aiogram.utils.executor.start_webhook(dispatcher=DISPATCHER,
             webhook_path=CONFIG["bot"]["webhook_path"],
             on_startup=on_startup,
@@ -75,4 +75,4 @@ def start_bot() -> None:
             port=int(os.getenv("PORT")) # heroku assigns a random open port to each dyno, so assume we have an envvar denoting it.
         )
     else:
-        raise ValueError("Launch strategy incorrect. Please check your .env file for correctness.")
+        raise ValueError("Launch strategy incorrect. Please check your config for correctness.")
